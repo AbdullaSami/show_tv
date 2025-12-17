@@ -11,7 +11,7 @@ class UpdateSeasonRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check();
     }
 
     /**
@@ -22,7 +22,9 @@ class UpdateSeasonRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'season_number' => 'sometimes|required|integer|min:1',
+            'title' => 'sometimes|required|string|max:255',
+            'poster' => 'nullable|image|max:2048',
         ];
     }
 }

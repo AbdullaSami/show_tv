@@ -11,7 +11,7 @@ class StoreSeasonRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check();
     }
 
     /**
@@ -22,7 +22,10 @@ class StoreSeasonRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'show_id' => 'required|exists:shows,id',
+            'season_number' => 'required|integer|min:1',
+            'title' => 'required|string|max:255',
+            'poster' => 'nullable|image|max:2048',
         ];
     }
 }

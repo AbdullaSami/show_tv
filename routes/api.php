@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 // controllers
 use App\Http\Controllers\ShowController;
+use App\Http\Controllers\SeasonController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -15,3 +16,5 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::apiResource('shows', ShowController::class);
+Route::apiResource('seasons', SeasonController::class);
+Route::get('/show/{show}/seasons', [SeasonController::class, 'index']);
