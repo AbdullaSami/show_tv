@@ -11,7 +11,7 @@ class StoreShowRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check();
     }
 
     /**
@@ -22,7 +22,12 @@ class StoreShowRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'poster' => 'nullable|image|max:2048',
+            'air_time' => 'required|date_format:H:i',
+            'air_days' => 'sometimes|array|min:1',
+            'air_days.*' => 'required|string|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
         ];
     }
 }

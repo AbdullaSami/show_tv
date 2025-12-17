@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('shows', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->text('description');
-            $table->string('poster');
+            $table->text('description')->nullable();
+            $table->string('poster')->nullable();
             $table->time('air_time');
 
             $table->timestamps();

@@ -11,7 +11,7 @@ class UpdateShowRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check();
     }
 
     /**
@@ -22,7 +22,12 @@ class UpdateShowRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => 'sometimes|required|string|max:255',
+            'description' => 'sometimes|required|string',
+            'poster' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'air_time' => 'sometimes|required|date_format:H:i',
+            'air_days' => 'sometimes|required|array|min:1',
+            'air_days.*' => 'in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
         ];
     }
 }

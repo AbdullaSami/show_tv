@@ -24,9 +24,9 @@ class Show extends Model
 
     public function airDays()
     {
-        return $this->hasMany(ShowAirDay::class);
+        return $this->hasMany(ShowAirDay::class)->select('show_id','day');
     }
-    
+
     public function reactions()
 {
     return $this->morphMany(Reaction::class, 'reactable');
@@ -41,7 +41,6 @@ public function dislikes()
 {
     return $this->reactions()->where('type', 'dislike');
 }
-
 
 
 }
