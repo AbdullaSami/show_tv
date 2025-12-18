@@ -98,19 +98,10 @@ class SeasonController extends BaseController
             return response()->json(['error' => 'Show not found'], 404);
         }
         // Check for existing season number
-        if($show->seasons()->where('season_number', $validated['season_number'])->exists()) {
+        if($show->seasons()->where('season_number', $validated['season_number'])
+            ->where('id', '!=', $season->id)
+            ->exists()) {
             return response()->json(['error' => 'Season number already exists for this show'], 409);
-        }
-        // Ensure season numbers are sequential
-        if($show->seasons()->latest('season_number')->first()) {
-            $latestSeasonNumber = $show->seasons()->latest('season_number')->first()->season_number;
-            if($validated['season_number'] != $latestSeasonNumber + 1) {
-                return response()->json(['error' => 'Season number must be sequential'], 422);
-            }
-        } else {
-            if($validated['season_number'] != 1) {
-                return response()->json(['error' => 'First season number must be 1'], 422);
-            }
         }
 
         if ($request->hasFile('poster')) {

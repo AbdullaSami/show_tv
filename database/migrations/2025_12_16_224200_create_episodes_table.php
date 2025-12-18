@@ -16,11 +16,11 @@ return new class extends Migration
             $table->foreignId('season_id')->constrained()->onDelete('cascade');
             $table->unsignedInteger('episode_number');
             $table->string('title');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->integer('duration')->nullable(); // duration in minutes
-            $table->dateTime('air_time')->nullable();
+            $table->time('air_time')->nullable();
             $table->string('thumbnail')->nullable();
-            $table->string('video_url');
+            $table->string('video_url')->nullable();
             $table->timestamps();
 
             $table->unique(['season_id', 'episode_number']);

@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UpdateShowRequest extends FormRequest
 {
@@ -29,5 +31,15 @@ class UpdateShowRequest extends FormRequest
             'air_days' => 'sometimes|required|array|min:1',
             'air_days.*' => 'in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
         ];
+    }
+
+        protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 422)
+        );
     }
 }
