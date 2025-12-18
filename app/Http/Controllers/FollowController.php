@@ -2,65 +2,45 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreFollowRequest;
-use App\Http\Requests\UpdateFollowRequest;
 use App\Models\Follow;
+use Illuminate\Http\Request;
 
 class FollowController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+
+    public function follow(Request $request)
     {
-        //
+        $user = auth()->user();
+        $userId = $user->id;
+        $request->validate([
+            'show_id' => 'required|exists:shows,id',
+        ]);
+
+        $follow = Follow::create([
+            'user_id' => $userId,
+            'show_id' => $request->show_id,
+        ]);
+
+        return response()->json(['message' => 'Successfully followed user', 'follow' => $follow], 201);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function unfollow(Request $request)
     {
-        //
-    }
+        $user = auth()->user();
+        $userId = $user->id;
+        $request->validate([
+            'show_id' => 'required|exists:shows,id',
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreFollowRequest $request)
-    {
-        //
-    }
+        $follow = Follow::where('user_id', $userId)
+                        ->where('show_id', $request->show_id)
+                        ->first();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Follow $follow)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Follow $follow)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateFollowRequest $request, Follow $follow)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Follow $follow)
-    {
-        //
+        if ($follow) {
+            $follow->delete();
+            return response()->json(['message' => 'Successfully unfollowed user'], 200);
+        } else {
+            return response()->json(['message' => 'Follow relationship not found'], 404);
+        }
     }
 }
