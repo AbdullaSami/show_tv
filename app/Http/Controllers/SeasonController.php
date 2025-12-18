@@ -27,7 +27,9 @@ class SeasonController extends BaseController
             $seasons = Season::where('show_id', $show)->with( 'episodes')
             ->withCount(['likes', 'dislikes', 'episodes'])
             ->get();
-            return response()->json($seasons, 200);
+            return response()->json([
+                "data"=>$seasons
+            ], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to retrieve seasons'], 500);
         }

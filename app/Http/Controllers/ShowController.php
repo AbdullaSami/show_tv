@@ -68,7 +68,10 @@ class ShowController extends BaseController
     {
         try{
             $show->load('airDays', 'seasons.episodes')->loadCount(['likes as likesCount', 'dislikes as dislikesCount']);
-            return response()->json($show, 200);
+            return response()->json([
+                "data"=>$show
+            ]
+            , 200);
         }catch(\Exception $e){
             return response()->json(['error' => 'Failed to retrieve show', $e->getMessage()], 500);
         }
