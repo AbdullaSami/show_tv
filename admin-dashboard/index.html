@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - ShowTV</title>
+    <!-- Bootstrap 3.4.1 CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <!-- Font Awesome 4.7.0 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+        <!-- Main Header -->
+        <header class="main-header">
+            <!-- Logo -->
+            <a href="index.html" class="logo">
+                <span class="logo-mini"><b>STV</b></span>
+                <span class="logo-lg"><b>ShowTV</b> Admin</span>
+            </a>
+
+            <!-- Header Navbar -->
+            <nav class="navbar navbar-static-top" role="navigation">
+                <!-- Sidebar toggle button-->
+                <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                    <span class="sr-only">Toggle navigation</span>
+                </a>
+                <!-- Navbar Right Menu -->
+                <div class="navbar-custom-menu">
+                    <ul class="nav navbar-nav">
+                        <!-- User Account Menu -->
+                        <li class="dropdown user user-menu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <img src="img/user2-160x160.jpg" class="user-image" alt="User Image">
+                                <span class="hidden-xs" id="adminName">Admin</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="user-header">
+                                    <img src="img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                                    <p id="adminEmail">
+                                        admin@example.com
+                                    </p>
+                                </li>
+                                <li class="user-footer">
+                                    <div class="pull-right">
+                                        <a href="#" class="btn btn-default btn-flat" id="btnLogout">Sign out</a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Left side column. contains the logo and sidebar -->
+        <aside class="main-sidebar">
+            <!-- sidebar: style can be found in sidebar.less -->
+            <section class="sidebar">
+                <!-- Sidebar Menu -->
+                <ul class="sidebar-menu" data-widget="tree">
+                    <li class="header">MAIN NAVIGATION</li>
+                    <li class="active">
+                        <a href="#dashboard" class="nav-link" data-route="dashboard">
+                            <i class="fa fa-dashboard"></i> <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#shows" class="nav-link" data-route="shows">
+                            <i class="fa fa-television"></i> <span>TV Shows</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#seasons" class="nav-link" data-route="seasons">
+                            <i class="fa fa-list-ol"></i> <span>Seasons</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#episodes" class="nav-link" data-route="episodes">
+                            <i class="fa fa-film"></i> <span>Episodes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#users" class="nav-link" data-route="users">
+                            <i class="fa fa-users"></i> <span>Users</span>
+                        </a>
+                    </li>
+                </ul>
+            </section>
+        </aside>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <h1 id="pageTitle">
+                    Dashboard
+                    <small>Control panel</small>
+                </h1>
+                <ol class="breadcrumb">
+                    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+                    <li class="active" id="breadcrumbActive">Dashboard</li>
+                </ol>
+            </section>
+
+            <!-- Main content -->
+            <section class="content" id="mainContent">
+                <!-- Dashboard content will be loaded here dynamically -->
+            </section>
+        </div>
+
+        <!-- Main Footer -->
+        <footer class="main-footer">
+            <div class="pull-right hidden-xs">
+                <b>Version</b> 1.0.0
+            </div>
+            <strong>Copyright &copy; 2023 <a href="#">ShowTV</a>.</strong> All rights reserved.
+        </footer>
+    </div>
+
+    <div class="loading-spinner">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- REQUIRED JS SCRIPTS -->
+    <!-- jQuery 3.6.0 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap 3.4.1 JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="js/app.js"></script>
+    <!-- Custom JS -->
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/shows.js"></script>
+    <script src="js/seasons.js"></script>
+    <script src="js/episodes.js"></script>
+    <script src="js/users.js"></script>
+</body>
+</html>

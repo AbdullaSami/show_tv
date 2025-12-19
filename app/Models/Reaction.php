@@ -12,6 +12,9 @@ class Reaction extends Model
 
     protected $fillable = [
         'type',
+        'user_id',
+        'reactable_id',
+        'reactable_type',
     ];
 
     public function reactable()

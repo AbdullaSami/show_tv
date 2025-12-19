@@ -3,6 +3,7 @@
 use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\EpisodeController;
 use App\Http\Controllers\FollowController;
+use App\Http\Controllers\ReactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,10 +25,23 @@ Route::apiResource('seasons', SeasonController::class);
 Route::get('/show/{show}/seasons', [SeasonController::class, 'index']);
 // Episodes routes
 Route::apiResource('episodes', EpisodeController::class);
-Route::get('/season/{season}/episodes', [EpisodeController::class, 'index']);
+Route::get('/season/{season}/episodes', [EpisodeController::class, 'bySeason']);
 
 // (Un)Follow routes
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/followed-shows', [FollowController::class, 'followedShows']);
     Route::post('/follow', [FollowController::class, 'follow']);
     Route::delete('/unfollow', [FollowController::class, 'unfollow']);
+});
+
+// Reactions routes
+Route::middleware(['auth:sanctum'])->group(function () {
+    // Like a model
+    Route::post('/reaction/like', [ReactionController::class, 'like'])->name('reaction.like');
+
+    // Dislike a model
+    Route::post('/reaction/dislike', [ReactionController::class, 'dislike'])->name('reaction.dislike');
+
+    // Remove reaction from a model
+    Route::delete('/reaction', [ReactionController::class, 'remove'])->name('reaction.remove');
 });

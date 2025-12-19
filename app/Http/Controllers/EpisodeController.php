@@ -6,6 +6,7 @@ use App\Http\Requests\StoreEpisodeRequest;
 use App\Http\Requests\UpdateEpisodeRequest;
 use App\Models\Episode;
 use App\Models\Season;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Routing\Controller as BaseController;
@@ -22,10 +23,56 @@ class EpisodeController extends BaseController
     /**
      * Display a listing of the resource.
      */
-    public function index($season)
+    public function index(Request $request)
     {
         try {
-            $episodes = Episode::where('season_id', $season)->get();
+            $query = Episode::query()
+                ->with(['season.show'])
+                ->withCount(['likes', 'dislikes']);
+
+            if ($request->filled('season_id')) {
+                $query->where('season_id', $request->input('season_id'));
+            }
+
+            if ($request->filled('search')) {
+                $search = $request->input('search');
+                $query->where('title', 'like', "%{$search}%");
+            }
+
+            if ($request->filled('latest')) {
+                $limit = (int) $request->input('latest');
+                if ($limit <= 0) {
+                    $limit = 10;
+                }
+                if ($limit > 50) {
+                    $limit = 50;
+                }
+
+                $episodes = $query->latest()->limit($limit)->get();
+            } else {
+                $episodes = $query->get();
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $episodes
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to retrieve episodes',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function bySeason($season)
+    {
+        try {
+            $episodes = Episode::where('season_id', $season)
+                ->withCount(['likes', 'dislikes'])
+                ->get();
+
             return response()->json([
                 'status' => 'success',
                 'data' => $episodes

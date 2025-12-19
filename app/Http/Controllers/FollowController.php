@@ -8,9 +8,19 @@ use Illuminate\Http\Request;
 class FollowController extends Controller
 {
 
+    public function followedShows(Request $request)
+    {
+        $user = $request->user();
+        $userId = $user->id;
+
+        $ids = Follow::where('user_id', $userId)->pluck('show_id');
+
+        return response()->json(['data' => $ids], 200);
+    }
+
     public function follow(Request $request)
     {
-        $user = auth()->user();
+        $user = $request->user();
         $userId = $user->id;
         $request->validate([
             'show_id' => 'required|exists:shows,id',
@@ -26,7 +36,7 @@ class FollowController extends Controller
 
     public function unfollow(Request $request)
     {
-        $user = auth()->user();
+        $user = $request->user();
         $userId = $user->id;
         $request->validate([
             'show_id' => 'required|exists:shows,id',

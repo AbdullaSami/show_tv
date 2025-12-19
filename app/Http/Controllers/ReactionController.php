@@ -2,65 +2,89 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreReactionRequest;
-use App\Http\Requests\UpdateReactionRequest;
+use Illuminate\Http\Request;
 use App\Models\Reaction;
+use App\Models\Show;
+use App\Models\Season;
+use App\Models\Episode;
 
 class ReactionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+
+    public function like(Request $request)
     {
-        //
+        return $this->react($request, 'like');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function dislike(Request $request)
     {
-        //
+        return $this->react($request, 'dislike');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreReactionRequest $request)
+    private function react(Request $request, string $type)
     {
-        //
+        $user = $request->user()->id;
+        $validated = $request->validate([
+            'reactable_id' => 'required|integer',
+            'reactable_type' => 'required|string', // e.g., App\Models\Episode
+        ]);
+
+        $modelClass = $this->normalizeReactableType($validated['reactable_type']);
+        $model = $modelClass::findOrFail($validated['reactable_id']);
+
+        // Update or create reaction
+        $reaction = Reaction::updateOrCreate(
+            [
+                'user_id' => $user,
+                'reactable_id' => $model->id,
+                'reactable_type' => $modelClass,
+            ],
+            ['type' => $type]
+        );
+
+        return $this->reactionResponse($model, $reaction);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Reaction $reaction)
+    public function remove(Request $request)
     {
-        //
+        $user = $request->user()->id;
+        $validated = $request->validate([
+            'reactable_id' => 'required|integer',
+            'reactable_type' => 'required|string',
+        ]);
+
+        $modelClass = $this->normalizeReactableType($validated['reactable_type']);
+        $model = $modelClass::findOrFail($validated['reactable_id']);
+
+        Reaction::where('user_id', $user)
+            ->where('reactable_id', $model->id)
+            ->where('reactable_type', $modelClass)
+            ->delete();
+
+        return $this->reactionResponse($model, null);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Reaction $reaction)
+    private function normalizeReactableType(string $reactableType): string
     {
-        //
+        $type = strtolower(trim($reactableType));
+
+        if ($type === 'show') return Show::class;
+        if ($type === 'season') return Season::class;
+        if ($type === 'episode') return Episode::class;
+
+        return $reactableType;
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateReactionRequest $request, Reaction $reaction)
+    private function reactionResponse($model, $reaction)
     {
-        //
-    }
+        $likesCount = method_exists($model, 'likes') ? $model->likes()->count() : 0;
+        $dislikesCount = method_exists($model, 'dislikes') ? $model->dislikes()->count() : 0;
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Reaction $reaction)
-    {
-        //
+        return response()->json([
+            'status' => 'success',
+            'reaction' => $reaction,
+            'likes_count' => $likesCount,
+            'dislikes_count' => $dislikesCount,
+        ]);
     }
 }
