@@ -70,6 +70,7 @@ class EpisodeController extends BaseController
     {
         try {
             $episodes = Episode::where('season_id', $season)
+            ->with(['season.show'])
                 ->withCount(['likes', 'dislikes'])
                 ->get();
 

@@ -28,10 +28,15 @@ function checkAuthStatus() {
     if (token && userData) {
         try {
             state.currentUser = JSON.parse(userData);
+            state.authToken = token;
             updateAuthUI(true);
         } catch (e) {
             console.error('Error parsing user data:', e);
-            logout();
+            localStorage.removeItem(config.tokenKey);
+            localStorage.removeItem(config.userKey);
+            state.authToken = null;
+            state.currentUser = null;
+            updateAuthUI(false);
         }
     } else {
         updateAuthUI(false);
@@ -174,8 +179,17 @@ async function apiRequest(url, method = 'GET', data = null, requiresAuth = true)
 // Initialize the application
 function init() {
     // Check authentication status
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem(config.tokenKey);
+    const userData = localStorage.getItem(config.userKey);
     if (token) {
+        state.authToken = token;
+        if (userData) {
+            try {
+                state.currentUser = JSON.parse(userData);
+            } catch (e) {
+                // ignore
+            }
+        }
         // Set auth header for all requests
         $.ajaxSetup({
             headers: {

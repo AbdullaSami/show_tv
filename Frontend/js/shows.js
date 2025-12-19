@@ -233,10 +233,15 @@ async function loadSeasonPage(seasonId) {
         $('.page-content').html('<div id="season-details"></div>');
 
         const response = await fetch(`${config.apiBaseUrl}/seasons/${seasonId}`);
-        const { data: season } = await response.json();
+        const seasonPayload = await response.json();
+        const season = seasonPayload && seasonPayload.data ? seasonPayload.data : seasonPayload;
 
         if (!response.ok) {
             throw new Error('Failed to load season details');
+        }
+
+        if (!season) {
+            throw new Error('Season response is empty');
         }
 
         const seasonDetails = $('#season-details');
@@ -263,13 +268,28 @@ async function loadSeasonPage(seasonId) {
         `);
 
         // Load episodes
-        const episodesResponse = await fetch(`${config.apiBaseUrl}/season/${seasonId}/episodes`);
-        const episodesData = await episodesResponse.json();
+        let episodes = Array.isArray(season.episodes) ? season.episodes : null;
 
-        if (episodesResponse.ok && episodesData.data && episodesData.data.length > 0) {
+        if (!episodes) {
+            const episodesHeaders = state.authToken
+                ? { 'Accept': 'application/json', 'Authorization': `Bearer ${state.authToken}` }
+                : { 'Accept': 'application/json' };
+
+            const episodesResponse = await fetch(`${config.apiBaseUrl}/season/${seasonId}/episodes`, {
+                headers: episodesHeaders
+            });
+            const episodesPayload = await episodesResponse.json();
+            episodes = episodesPayload && episodesPayload.data ? episodesPayload.data : episodesPayload;
+
+            if (!episodesResponse.ok) {
+                episodes = [];
+            }
+        }
+
+        if (Array.isArray(episodes) && episodes.length > 0) {
             const episodesList = $('#episodes-list');
 
-            episodesData.data.forEach(episode => {
+            episodes.forEach(episode => {
                 episodesList.append(`
                     <div class="list-group-item episode-item">
                         <div class="row">
@@ -312,10 +332,34 @@ async function loadEpisodePage(episodeId) {
         $('.page-content').html('<div id="episode-details"></div>');
 
         const response = await fetch(`${config.apiBaseUrl}/episodes/${episodeId}`);
-        const { data: episode } = await response.json();
+        const episodePayload = await response.json();
+        const episode = episodePayload && episodePayload.data ? episodePayload.data : episodePayload;
 
         if (!response.ok) {
             throw new Error('Failed to load episode details');
+        }
+
+        if (!episode) {
+            throw new Error('Episode response is empty');
+        }
+
+        if (!episode.season && episode.season_id) {
+            try {
+                const seasonHeaders = state.authToken
+                    ? { 'Accept': 'application/json', 'Authorization': `Bearer ${state.authToken}` }
+                    : { 'Accept': 'application/json' };
+
+                const seasonRes = await fetch(`${config.apiBaseUrl}/seasons/${episode.season_id}`, {
+                    headers: seasonHeaders
+                });
+                const seasonPayload = await seasonRes.json();
+                const season = seasonPayload && seasonPayload.data ? seasonPayload.data : seasonPayload;
+                if (seasonRes.ok && season) {
+                    episode.season = season;
+                }
+            } catch (e) {
+                // ignore
+            }
         }
 
         const episodeDetails = $('#episode-details');
@@ -383,10 +427,17 @@ async function loadEpisodePage(episodeId) {
 
         // Load related episodes (other episodes from the same season)
         if (episode.season_id) {
-            const relatedResponse = await fetch(`${config.apiBaseUrl}/season/${episode.season_id}/episodes`);
-            const { data: relatedEpisodes } = await relatedResponse.json();
+            const relatedHeaders = state.authToken
+                ? { 'Accept': 'application/json', 'Authorization': `Bearer ${state.authToken}` }
+                : { 'Accept': 'application/json' };
 
-            if (relatedResponse.ok && relatedEpisodes && relatedEpisodes.length > 0) {
+            const relatedResponse = await fetch(`${config.apiBaseUrl}/season/${episode.season_id}/episodes`, {
+                headers: relatedHeaders
+            });
+            const relatedPayload = await relatedResponse.json();
+            const relatedEpisodes = relatedPayload && relatedPayload.data ? relatedPayload.data : relatedPayload;
+
+            if (relatedResponse.ok && Array.isArray(relatedEpisodes) && relatedEpisodes.length > 0) {
                 const relatedList = $('#related-episodes-list');
 
                 relatedEpisodes

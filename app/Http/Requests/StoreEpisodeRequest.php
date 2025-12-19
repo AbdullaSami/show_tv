@@ -30,7 +30,7 @@ class StoreEpisodeRequest extends FormRequest
             'duration' => 'nullable|integer|min:1',
             'air_time' => 'nullable|date_format:H:i',
             'thumbnail' => 'nullable|image|max:2048',
-            'video_url' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg,video/quicktime|max:51200',
+            'video_url' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg,video/quicktime|max:512000', // max 500MB
         ];
     }
     protected function failedValidation(Validator $validator)

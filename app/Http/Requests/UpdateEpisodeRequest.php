@@ -30,7 +30,7 @@ class UpdateEpisodeRequest extends FormRequest
             'duration' => 'sometimes|integer|min:1',
             'air_time' => 'sometimes|date_format:H:i',
             'thumbnail' => 'sometimes|image|max:2048',
-            'video_url' => 'sometimes|file|mimetypes:video/mp4,video/avi,video/mpeg,video/quicktime|max:51200',
+            'video_url' => 'sometimes|file|mimetypes:video/mp4,video/avi,video/mpeg,video/quicktime|max:512000', // max 500MB
         ];
     }
 
