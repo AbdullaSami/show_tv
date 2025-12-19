@@ -37,8 +37,6 @@ class AuthController extends Controller
 
         // insert user data into database
         $user = $this->userLogic->insert($validatedData);
-        // assign registered user to user role
-        $user->assignRole('user');
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

@@ -35,6 +35,9 @@ const API_CONFIG = {
             show: (id) => `/users/${id}`,
             update: (id) => `/users/${id}`,
             delete: (id) => `/users/${id}`
+        },
+        permissions: {
+            list: '/permissions'
         }
     }
 };
@@ -358,6 +361,16 @@ const ApiService = {
     },
 
     createUser(data) {
+        if (data instanceof FormData) {
+            return this.ajax({
+                url: `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.users.create}`,
+                method: 'POST',
+                processData: false,
+                contentType: false,
+                data
+            });
+        }
+
         return this.ajax({
             url: `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.users.create}`,
             method: 'POST',
@@ -367,6 +380,17 @@ const ApiService = {
     },
 
     updateUser(id, data) {
+        if (data instanceof FormData) {
+            data.append('_method', 'PUT');
+            return this.ajax({
+                url: `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.users.update(id)}`,
+                method: 'POST',
+                processData: false,
+                contentType: false,
+                data
+            });
+        }
+
         return this.ajax({
             url: `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.users.update(id)}`,
             method: 'PUT',
@@ -379,6 +403,14 @@ const ApiService = {
         return this.ajax({
             url: `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.users.delete(id)}`,
             method: 'DELETE'
+        });
+    },
+
+    // Permissions
+    getPermissions() {
+        return this.ajax({
+            url: `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.permissions.list}`,
+            method: 'GET'
         });
     }
 };

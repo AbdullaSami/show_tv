@@ -4,9 +4,10 @@ use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\EpisodeController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\ReactionController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use Spatie\Permission\Models\Permission;
 // controllers
 use App\Http\Controllers\ShowController;
 use App\Http\Controllers\SeasonController;
@@ -18,6 +19,12 @@ Route::get('/user', function (Request $request) {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// Users routes
+Route::apiResource('users', UserController::class)->middleware('auth:sanctum');
+// permissions routes
+Route::get('/permissions', function(Request $request){
+    return Permission::all();
+});
 // Shows routes
 Route::apiResource('shows', ShowController::class);
 // Seasons routes

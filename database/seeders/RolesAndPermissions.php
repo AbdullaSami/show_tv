@@ -25,7 +25,6 @@ class RolesAndPermissions extends Seeder
             'view users',
             'create users',
             'edit users',
-            'update users',
             'delete users',
             // content related permissions
             'view content',
