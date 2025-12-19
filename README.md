@@ -1,59 +1,175 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ShowTV
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+ShowTV is a Laravel-based backend API with two static frontends:
 
-## About Laravel
+- `Frontend/` - end-user web app (browse shows/episodes, auth, etc.)
+- `admin-dashboard/` - admin panel (manage shows, seasons, episodes, users, roles/permissions)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The backend exposes a JSON REST API under `/api` and uses:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Laravel 12
+- Laravel Sanctum (API tokens)
+- Spatie Laravel Permission (roles & permissions)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Full functionalities
 
-## Learning Laravel
+### Backend API
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- Authentication
+  - `POST /api/register` register a user (supports image upload)
+  - `POST /api/login` login and receive a Sanctum `access_token`
+  - `GET /api/user` get authenticated user (requires `auth:sanctum`)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Users management (protected)
+  - `GET /api/users` list users (requires `auth:sanctum` + `permission:view users`)
+  - `POST /api/users` create user (requires `permission:create users`)
+  - `GET /api/users/{id}` show user (requires `permission:view users`)
+  - `PUT /api/users/{id}` update user (requires `permission:edit users`)
+  - `DELETE /api/users/{id}` delete user (requires `permission:delete users`)
+  - Supports:
+    - Role assignment (`role`)
+    - Permission assignment (`permissions[]` as an array of permission IDs)
+    - Optional profile image upload
 
-## Laravel Sponsors
+- Permissions
+  - `GET /api/permissions` list available permissions (used by admin dashboard)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- Content
+  - Shows: `Route::apiResource('shows', ...)`
+  - Seasons: `Route::apiResource('seasons', ...)` + `GET /api/show/{show}/seasons`
+  - Episodes: `Route::apiResource('episodes', ...)` + `GET /api/season/{season}/episodes`
 
-### Premium Partners
+- Social features
+  - Follow/unfollow shows (requires `auth:sanctum`)
+    - `GET /api/followed-shows`
+    - `POST /api/follow`
+    - `DELETE /api/unfollow`
+  - Reactions (requires `auth:sanctum`)
+    - `POST /api/reaction/like`
+    - `POST /api/reaction/dislike`
+    - `DELETE /api/reaction`
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Admin dashboard (`admin-dashboard/`)
 
-## Contributing
+- Login using API token (stored in `localStorage` as `admin_token`)
+- Manage:
+  - TV shows (CRUD)
+  - Seasons (CRUD)
+  - Episodes (CRUD)
+  - Users (CRUD)
+    - Assign role
+    - Assign permissions via `GET /api/permissions`
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Frontend (`Frontend/`)
 
-## Code of Conduct
+- Static web UI built with Bootstrap/jQuery
+- Auth (login/register)
+- Browse content via the API
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Project structure
 
-## Security Vulnerabilities
+- `routes/api.php` API routes
+- `app/Http/Controllers` controllers
+- `app/Logic` domain logic (e.g. `UserLogic` for roles/permissions)
+- `database/seeders` seeders (roles/permissions + demo content)
+- `admin-dashboard/` static admin panel
+- `Frontend/` static user-facing site
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Requirements
+
+- PHP `^8.2`
+- Composer
+- Node.js + npm
+- MySQL (default in `.env.example`)
+
+## Installation
+
+1) Install PHP dependencies
+
+```bash
+composer install
+```
+
+2) Setup environment
+
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+Update `.env` database settings:
+
+- `DB_DATABASE=showtv`
+- `DB_USERNAME=...`
+- `DB_PASSWORD=...`
+
+3) Run migrations
+
+```bash
+php artisan migrate
+```
+
+4) Seed roles/permissions + default admin
+
+```bash
+php artisan db:seed --class=Database\\Seeders\\RolesAndPermissions
+```
+
+Optional: seed demo content (if desired):
+
+```bash
+php artisan db:seed --class=Database\\Seeders\\ShowSeeder
+php artisan db:seed --class=Database\\Seeders\\SeasonSeeder
+php artisan db:seed --class=Database\\Seeders\\EpisodeSeeder
+php artisan db:seed --class=Database\\Seeders\\FollowSeeder
+php artisan db:seed --class=Database\\Seeders\\ReactionSeeder
+```
+
+5) Create public storage symlink (for uploaded images)
+
+```bash
+php artisan storage:link
+```
+
+6) Install frontend build dependencies (for Vite/Tailwind resources)
+
+```bash
+npm install
+```
+
+## Running the project
+
+### Backend API
+
+```bash
+php artisan serve
+```
+
+Default API base URL: `http://localhost:8000/api`
+
+### Admin dashboard
+
+1) Open `admin-dashboard/login.html` in a browser.
+2) Ensure the API base URL matches your backend:
+   - `admin-dashboard/js/api.js` -> `API_CONFIG.baseUrl`
+
+Default seeded admin credentials (if you ran the `RolesAndPermissions` seeder):
+
+- Email: `admin@show.tv`
+- Password: `password123`
+
+### Frontend
+
+1) Open `Frontend/index.html` in a browser.
+2) Ensure the API base URL matches your backend:
+   - `Frontend/js/main.js` -> `config.apiBaseUrl`
+
+## Notes / troubleshooting
+
+- **403 on `/api/users`**: the logged-in user must have the required permissions:
+  - `view users`, `create users`, `edit users`, `delete users`
+- **User permissions submission**: the admin dashboard sends `permissions[]` as an array of **permission IDs**; backend converts IDs to Spatie Permission models before syncing.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is licensed under the MIT License.
